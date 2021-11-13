@@ -1,4 +1,3 @@
-
 import './sass/main.scss';
 import refs from './js/refs';
 import cardMarkup from './templates/card-markup.hbs';
@@ -16,8 +15,10 @@ let page = 1;
 
 function onFormSubmit(e) {
   e.preventDefault();
+  let inValue = e.currentTarget.elements.query.value.trim();
   const value = e.currentTarget.elements.query.value;
-  if (value === '') {
+  if (value === '' || !inValue) {
+    e.currentTarget.elements.query.value = '';
     return info({
       text: 'Enter the value!',
       delay: 2000,
@@ -38,7 +39,7 @@ function onFormSubmit(e) {
   fetch(`${BASE_URL}?${queryParam}&page=${page}`)
     .then(res => res.json())
     .then(data => {
-      refs.loadMoreBtn.classList.remove('is-hidden');
+      // refs.loadMoreBtn.classList.remove('is-hidden');
       renderCard(data);
     });
 
@@ -50,6 +51,12 @@ function onFormSubmit(e) {
         delay: 2000,
         closerHover: true,
       });
+    }
+    if (hits.length % 12 != 0) {
+      refs.loadMoreBtn.classList.add('is-hidden');
+    }
+    if (hits.length >= 12) {
+      refs.loadMoreBtn.classList.remove('is-hidden');
     }
     refs.list.innerHTML = cardMarkup(hits);
   }
@@ -76,7 +83,7 @@ function onLoadMoreBtnClick() {
     .then(res => res.json())
     .then(data => {
       renderCard(data);
-      refs.loadMoreBtn.classList.remove('is-hidden');
+      // refs.loadMoreBtn.classList.remove('is-hidden');
       buttonClick();
     });
 
@@ -88,7 +95,12 @@ function onLoadMoreBtnClick() {
 const hiddenElement = refs.loadMoreBtn;
 
 function buttonClick() {
-  hiddenElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  setTimeout(() => {
+    hiddenElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'end',
+    });
+  }, 1000);
 }
 
 function onPictureClick(e) {
